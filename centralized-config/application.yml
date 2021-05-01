@@ -1,0 +1,7 @@
+spring :
+    application:
+        name:config-server
+productservice :
+    port : 6015
+reviewservice :
+    port : 6016
