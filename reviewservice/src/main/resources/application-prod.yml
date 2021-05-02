@@ -1,0 +1,31 @@
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    service-url:
+      defaultZone: http://serviceregistry:8761
+
+management:
+  health:
+    elasticsearch:
+      enabled: false
+
+spring:
+  jackson:
+    serialization:
+      indent-output: true
+  cloud:
+    config:
+      uri: http://configserver:8762
+      # name of the config server's property source (file.yml) that we want to use
+      name: productservice
+      profile: dev
+      label: main # toggle to switch to a different version of the configuration as stored in git
+      # it can be set to any label, branch or commit of the configuration source Git repository
+  data:
+  elasticsearch:
+    rest:
+      uris: http://elasticsearch:9200
+
+server:
+  port: 6017

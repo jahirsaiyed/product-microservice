@@ -1,0 +1,42 @@
+{
+  "settings": {
+    "index": {
+      "number_of_shards": 4,
+      "number_of_replicas": 1,
+      "refresh_interval": "1s"
+    }
+  },
+  "mappings": {
+    "properties": {
+      "brand": {
+        "type": "keyword"
+      },
+      "id": {
+        "type": "long"
+      },
+      "product_id": {
+        "type": "long"
+      },
+      "review_score": {
+        "type": "integer"
+      },
+      "comment": {
+        "type": "text",
+        "norms": false,
+        "similarity": "boolean",
+        "fields": {
+          "raw": {
+            "type": "keyword"
+          },
+          "terms": {
+            "type": "token_count",
+            "analyzer": "standard"
+          }
+        }
+      },
+      "active": {
+        "type": "boolean"
+      }
+    }
+  }
+}
