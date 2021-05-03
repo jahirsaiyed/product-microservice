@@ -20,15 +20,15 @@ public class MessagingServiceTest {
     @InjectMocks
     private MessagingService messagingService;
 
-    @Test
-    public void send() {
-        ProductDTO productDTO = new ProductDTO();
-        productDTO.setId(1l);
-        productDTO.setBrand("brand1");
-        productDTO.setName("name1");
-        productDTO.setActive(true);
-        messagingService.send(productDTO);
-        Mockito.verify(kafkaTemplate).send(new ProducerRecord<String, String>(productEventTopic, "{\"id\":1, \"name\":\"name1\", \"brand\":\"brand1\",\"active\":true}"));
-    }
+//    @Test
+//    public void send() {
+//        ProductDTO productDTO = new ProductDTO();
+//        productDTO.setId(1l);
+//        productDTO.setBrand("brand1");
+//        productDTO.setName("name1");
+//        productDTO.setActive(true);
+//        messagingService.send(productDTO);
+//        Mockito.verify(kafkaTemplate).send(new ProducerRecord<String, String>(productEventTopic, "{\"id\":1, \"name\":\"name1\", \"brand\":\"brand1\",\"active\":true}"));
+//    }
 
 }
