@@ -30,7 +30,7 @@ public class ReviewEventHandler {
     }
 
     @KafkaListener(topics = "${REVIEW_EVENTS_TOPIC}", groupId = "${REVIEW_EVENTS_GROUP}")
-    public void handle(@Payload String eventMessage) throws JsonProcessingException {
+    public void handle(@Payload String eventMessage) {
         try {
             ReviewDTO reviewDTO = mapper.readValue(eventMessage, ReviewDTO.class);
             Review review = reviewMapper.toEntity(reviewDTO);

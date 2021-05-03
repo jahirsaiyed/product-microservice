@@ -69,42 +69,42 @@ public class ReviewServiceTest {
     void partialUpdate() {
         when(reviewRepository.findById(1l)).thenReturn(Optional.of(review));
         when(reviewRepository.save(Mockito.any())).then(returnsFirstArg());
-        ReviewDTO productDTO = new ReviewDTO();
-        productDTO.setId(1l);
-        productDTO.setReviewCount(31l);
-        ReviewDTO save = reviewService.partialUpdate(productDTO).get();
+        ReviewDTO reviewDTO = new ReviewDTO();
+        reviewDTO.setId(1l);
+        reviewDTO.setReviewCount(31l);
+        ReviewDTO save = reviewService.partialUpdate(reviewDTO).get();
         verify(reviewRepository).save(review);
-        ReviewDTO productDTOMessageSent = ReviewUtils.copy(this.reviewDTO);
-        productDTOMessageSent.setId(productDTO.getId());
-        productDTOMessageSent.setReviewCount(productDTO.getReviewCount());
-        verify(messagingService).send(productDTOMessageSent);
+        ReviewDTO reviewDTOMessageSent = ReviewUtils.copy(this.reviewDTO);
+        reviewDTOMessageSent.setId(reviewDTO.getId());
+        reviewDTOMessageSent.setReviewCount(reviewDTO.getReviewCount());
+        verify(messagingService).send(reviewDTOMessageSent);
         Assertions.assertNotEquals(this.reviewDTO, save);
-        save.setReviewCount(productDTO.getReviewCount());
-        Assertions.assertEquals(productDTOMessageSent, save);
+        save.setReviewCount(reviewDTO.getReviewCount());
+        Assertions.assertEquals(reviewDTOMessageSent, save);
     }
 
     @Test
     void findAll() {
         when(reviewSearchRepository.findByActive(any()))
                 .thenReturn(new PageImpl<>(Arrays.asList(new Review()), PageRequest.of(0,1), 1));
-        Page<ReviewDTO> productDTOPage = reviewService.findAll(PageRequest.of(1, 1));
-        Assertions.assertEquals(1, productDTOPage.getTotalElements());
+        Page<ReviewDTO> reviewDTOPage = reviewService.findAll(PageRequest.of(1, 1));
+        Assertions.assertEquals(1, reviewDTOPage.getTotalElements());
     }
 
     @Test
     void findAllEmpty() {
         when(reviewSearchRepository.findByActive(any())).
                 thenReturn(new PageImpl<>(Collections.emptyList(), PageRequest.of(0,1), 0));
-        Page<ReviewDTO> productDTOPage = reviewService.findAll(PageRequest.of(1, 1));
-        Assertions.assertEquals(0, productDTOPage.getTotalElements());
+        Page<ReviewDTO> reviewDTOPage = reviewService.findAll(PageRequest.of(1, 1));
+        Assertions.assertEquals(0, reviewDTOPage.getTotalElements());
     }
 
     @Test
     void findAllNextPage() {
         when(reviewSearchRepository.findByActive(any()))
                 .thenReturn(new PageImpl<>(Collections.emptyList(), PageRequest.of(1,10), 3));
-        Page<ReviewDTO> productDTOPage = reviewService.findAll(PageRequest.of(1, 10));
-        Assertions.assertEquals(3, productDTOPage.getTotalElements());
+        Page<ReviewDTO> reviewDTOPage = reviewService.findAll(PageRequest.of(1, 10));
+        Assertions.assertEquals(3, reviewDTOPage.getTotalElements());
     }
 
     @Test
