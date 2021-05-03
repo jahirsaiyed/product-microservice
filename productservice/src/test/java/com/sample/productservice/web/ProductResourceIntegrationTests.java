@@ -56,4 +56,15 @@ public class ProductResourceIntegrationTests {
         Optional<Product> optionalProduct = productRepository.findById(createdProduct.getId());
         Assertions.assertEquals(createdProduct, productMapper.toDto(optionalProduct.get()));
     }
+
+//    @Test
+//    public void testUpdateNonExistingProduct() {
+//        ProductDTO productDTO = new ProductDTO();
+//        productDTO.setBrand("Brand1");
+//        productDTO.setName("Name1");
+//        this.restTemplate
+//                .put("http://localhost:" + port + "/api/products/-123"+productDTO.getId(), productDTO, ProductDTO.class);
+//        Optional<Product> optionalProduct = productRepository.findById(productDTO.getId());
+//        Assertions.assertEquals(productDTO, productMapper.toDto(optionalProduct.get()));
+//    }
 }
