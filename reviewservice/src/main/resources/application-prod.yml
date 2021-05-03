@@ -3,7 +3,7 @@ eureka:
     prefer-ip-address: true
   client:
     service-url:
-      defaultZone: http://serviceregistry:8761
+      defaultZone: "http://serviceregistry_product_review:8761"
 
 management:
   health:
@@ -16,16 +16,20 @@ spring:
       indent-output: true
   cloud:
     config:
-      uri: http://configserver:8762
+      uri: "http://configserver_product_review:8762"
       # name of the config server's property source (file.yml) that we want to use
-      name: productservice
+      name: reviewservice
       profile: dev
       label: main # toggle to switch to a different version of the configuration as stored in git
       # it can be set to any label, branch or commit of the configuration source Git repository
   data:
   elasticsearch:
     rest:
-      uris: http://elasticsearch:9200
-
+      uris: "http://elasticsearch_product_review:9200"
+  embedded:
+    kafka:
+      brokers: "kafka_product_review:9092"
+  datasource:
+    url: "jdbc:mysql://mysql_product_review:3306/reviewservice?useSSL=false"
 server:
   port: 6017

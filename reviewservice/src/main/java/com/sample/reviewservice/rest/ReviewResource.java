@@ -1,20 +1,15 @@
 package com.sample.reviewservice.rest;
 
 import com.sample.reviewservice.repository.ReviewRepository;
-import com.sample.reviewservice.rest.util.PaginationUtil;
 import com.sample.reviewservice.rest.util.ResponseUtil;
 import com.sample.reviewservice.service.ReviewService;
 import com.sample.reviewservice.service.dto.ReviewDTO;
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -131,8 +126,7 @@ public class ReviewResource {
     public ResponseEntity<List<ReviewDTO>> getAllReviews(Pageable pageable) {
         log.debug("REST request to get a page of Reviews");
         Page<ReviewDTO> page = reviewService.findAll(pageable);
-        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
-        return ResponseEntity.ok().headers(headers).body(page.getContent());
+        return ResponseEntity.ok().body(page.getContent());
     }
 
     /**

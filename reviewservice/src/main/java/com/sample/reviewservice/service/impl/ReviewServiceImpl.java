@@ -14,7 +14,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 
 import static org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
@@ -25,7 +24,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     private final Logger log = LoggerFactory.getLogger(ReviewServiceImpl.class);
 
-    private final ReviewRepository revisionRepository;
+    private final ReviewRepository reviewRepository;
 
     private final ReviewMapper reviewMapper;
 
@@ -34,11 +33,11 @@ public class ReviewServiceImpl implements ReviewService {
     private final MessagingService messagingService;
 
     public ReviewServiceImpl(
-            ReviewRepository revisionRepository,
+            ReviewRepository reviewRepository,
             ReviewMapper reviewMapper,
             ReviewSearchRepository reviewSearchRepository,
             MessagingService messagingService) {
-        this.revisionRepository = revisionRepository;
+        this.reviewRepository = reviewRepository;
         this.reviewMapper = reviewMapper;
         this.reviewSearchRepository = reviewSearchRepository;
         this.messagingService = messagingService;
@@ -48,7 +47,7 @@ public class ReviewServiceImpl implements ReviewService {
     public ReviewDTO save(ReviewDTO reviewDTO) {
         log.debug("Request to save Review : {}", reviewDTO);
         Review review = reviewMapper.toEntity(reviewDTO);
-        review = revisionRepository.save(review);
+        review = reviewRepository.save(review);
         ReviewDTO result = reviewMapper.toDto(review);
         messagingService.send(result);
         return result;
@@ -58,14 +57,17 @@ public class ReviewServiceImpl implements ReviewService {
     public Optional<ReviewDTO> partialUpdate(ReviewDTO reviewDTO) {
         log.debug("Request to partially update Review : {}", reviewDTO);
 
-        return revisionRepository
+        return reviewRepository
                 .findById(reviewDTO.getId())
                 .map(existingReview -> {
                     reviewMapper.partialUpdate(existingReview, reviewDTO);
-                    messagingService.send(reviewDTO);
                     return existingReview;
                 })
-                .map(revisionRepository::save)
+                .map(review -> {
+                    review = reviewRepository.save(review);
+                    messagingService.send(reviewMapper.toDto(review));
+                    return review;
+                })
                 .map(reviewMapper::toDto);
     }
 
@@ -73,35 +75,39 @@ public class ReviewServiceImpl implements ReviewService {
     @Transactional(readOnly = true)
     public Page<ReviewDTO> findAll(Pageable pageable) {
         log.debug("Request to get all Reviews");
-        return reviewSearchRepository.findAll(pageable).map(reviewMapper::toDto);
+        return reviewSearchRepository.findByActive(pageable).map(reviewMapper::toDto);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Optional<ReviewDTO> findOne(Long id) {
         log.debug("Request to get Review : {}", id);
-        return reviewSearchRepository.findById(id).map(reviewMapper::toDto);
+        return reviewSearchRepository.findByIdAndActive(id, true).map(reviewMapper::toDto);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Optional<ReviewDTO> findByProductId(Long id) {
         log.debug("Request to get Review : {}", id);
-        return revisionRepository.findByProductId(id).map(reviewMapper::toDto);
+        return reviewRepository.findByProductIdAndActive(id, true).map(reviewMapper::toDto);
     }
 
     @Override
     public void delete(Long id) {
         log.debug("Request to delete Review : {}", id);
-        revisionRepository.deleteById(id);
-//        productSearchRepository.deleteById(id);
+        reviewRepository.deleteById(id);
+        Optional<Review> review = reviewSearchRepository.findById(id);
+        review.ifPresent(p -> {
+            p.setActive(false);
+            messagingService.send(reviewMapper.toDto(p));
+        });
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public Page<ReviewDTO> search(String query, Pageable pageable) {
-        log.debug("Request to search for a page of Reviews for query {}", query);
-        return reviewSearchRepository.search(queryStringQuery(query), pageable).map(reviewMapper::toDto);
-    }
+//    @Override
+//    @Transactional(readOnly = true)
+//    public Page<ReviewDTO> search(String query, Pageable pageable) {
+//        log.debug("Request to search for a page of Reviews for query {}", query);
+//        return reviewSearchRepository.search(queryStringQuery(query), pageable).map(reviewMapper::toDto);
+//    }
 
 }

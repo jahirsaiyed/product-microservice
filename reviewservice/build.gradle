@@ -46,9 +46,10 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.kafka:spring-kafka-test'
 	testImplementation 'org.springframework.security:spring-security-test'
-    testCompile 'org.junit.jupiter:junit-jupiter-engine:5.2.0'
-    testCompile('org.mockito:mockito-junit-jupiter:2.23.0')
+	testImplementation 'com.h2database:h2'
+	testCompile "org.testcontainers:elasticsearch:1.15.3"
 }
 
 dependencyManagement {

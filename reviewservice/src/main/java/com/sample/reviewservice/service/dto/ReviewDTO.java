@@ -10,4 +10,5 @@ public class ReviewDTO implements Serializable {
     private Long productId;
     private Float reviewScore;
     private Long reviewCount;
+    private Boolean active;
 }

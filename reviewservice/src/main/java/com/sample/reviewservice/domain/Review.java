@@ -27,4 +27,7 @@ public class Review implements Serializable {
     @Column(name = "review_count")
     private Long reviewCount;
 
+    @Column(name = "active")
+    private Boolean active;
+
 }
