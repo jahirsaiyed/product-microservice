@@ -33,7 +33,7 @@ public class ProductResourceIntegrationTests {
     private ProductMapper productMapper;
 
     @Test
-    public void testCreateProduct() {
+    public ProductDTO testCreateProduct() {
         ProductDTO productDTO = new ProductDTO();
         productDTO.setBrand("Brand");
         productDTO.setName("Name");
@@ -43,5 +43,17 @@ public class ProductResourceIntegrationTests {
         ProductDTO dto = responseEntity.getBody();
         Optional<Product> optionalProduct = productRepository.findById(dto.getId());
         Assertions.assertEquals(dto, productMapper.toDto(optionalProduct.get()));
+        return dto;
+    }
+
+    @Test
+    public void testUpdateProduct() {
+        ProductDTO createdProduct = testCreateProduct();
+        createdProduct.setBrand("Brand1");
+        createdProduct.setName("Name1");
+        this.restTemplate
+                .put("http://localhost:" + port + "/api/products/"+createdProduct.getId(), createdProduct, ProductDTO.class);
+        Optional<Product> optionalProduct = productRepository.findById(createdProduct.getId());
+        Assertions.assertEquals(createdProduct, productMapper.toDto(optionalProduct.get()));
     }
 }
