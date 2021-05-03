@@ -1,0 +1,1 @@
+run.bat - builds the docker images and runs docker-compose to run all containers.

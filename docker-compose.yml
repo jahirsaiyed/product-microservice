@@ -16,6 +16,7 @@ services:
         - ./init.sql:/data/application/init.sql
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.10.0
+    container_name: elasticsearch_product_review
     # volumes:
     #   - ~/volumes/reviewservice/elasticsearch/:/usr/share/elasticsearch/data/
     ports:
@@ -26,6 +27,7 @@ services:
       - 'discovery.type=single-node'
   kibana:
     image: docker.elastic.co/kibana/kibana:7.10.0
+    container_name: kibana_product_review
     ports:
       - 5601:5601
     environment:
@@ -33,18 +35,20 @@ services:
       ELASTICSEARCH_HOSTS: '["http://elasticsearch:9200"]'
   kafka:
     image: confluentinc/cp-kafka:5.5.3
+    container_name: kafka_product_review
     ports:
       - 9092:9092
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka_product_review:29092,PLAINTEXT_HOST://localhost:9092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_ADVERTISED_HOST_NAME: kafka
+      KAFKA_ADVERTISED_HOST_NAME: kafka_product_review
   zookeeper:
     image: confluentinc/cp-zookeeper:5.5.3
+    container_name: zookeeper_product_review
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
@@ -52,34 +56,39 @@ services:
       - 2181:2181
   jenkins:
     image: jenkins/jenkins:lts-jdk11
+    container_name: jenkins_product_review
     ports:
       - 49001:8080
       - 50000:50000
   service-registry-app:
     image: serviceregistry:0.0.1-SNAPSHOT
+    container_name: serviceregistry_product_review
     ports:
       - 8761:8761
   config-service-app:
     image: configserver:0.0.1-SNAPSHOT 
+    container_name: configserver_product_review
     ports:
       - 8762:8080
   productservice-app:
     image: productservice:0.0.1-SNAPSHOT
+    container_name: productservice_product_review
+    ports:
+      - 6015:6015
+    environment:
+      - _JAVA_OPTIONS=-Xmx512m -Xms256m
+      - SPRING_PROFILES_ACTIVE=prod,api-docs
+      - SPRING_ELASTICSEARCH_REST_URIS=http://elasticsearch_product_review:9200
+      - KAFKA_BOOTSTRAPSERVERS=kafka_product_review:9092      
+      
+  reviewservice-app:
+    image: reviewservice:0.0.1-SNAPSHOT
+    container_name: reviewservice_product_review
     ports:
       - 6017:6017
     environment:
       - _JAVA_OPTIONS=-Xmx512m -Xms256m
       - SPRING_PROFILES_ACTIVE=prod,api-docs
-      - MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED=true
-      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://admin:$${jhipster.registry.password}@jhipster-registry:8761/eureka
-      - SPRING_CLOUD_CONFIG_URI=http://localhost:8761/config
-      - SPRING_DATASOURCE_URL=jdbc:mysql://productservice-mysql:3306/productservice?useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC&createDatabaseIfNotExist=true
-      - SPRING_LIQUIBASE_URL=jdbc:mysql://productservice-mysql:3306/productservice?useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC&createDatabaseIfNotExist=true
-      - JHIPSTER_CACHE_REDIS_SERVER=redis://productservice-redis:6379
-      - JHIPSTER_CACHE_REDIS_CLUSTER=false
-      # - JHIPSTER_CACHE_REDIS_SERVER=redis://productservice-redis:6379
-      # - JHIPSTER_CACHE_REDIS_CLUSTER=true
-      - JHIPSTER_SLEEP=30 # gives time for other services to boot before the application
-      - SPRING_ELASTICSEARCH_REST_URIS=http://productservice-elasticsearch:9200
-      - KAFKA_BOOTSTRAPSERVERS=kafka:9092
+      - SPRING_ELASTICSEARCH_REST_URIS=http://elasticsearch_product_review:9200
+      - KAFKA_BOOTSTRAPSERVERS=kafka_product_review:9092   
   

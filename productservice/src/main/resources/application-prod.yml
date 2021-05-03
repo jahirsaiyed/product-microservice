@@ -3,7 +3,7 @@ eureka:
     prefer-ip-address: true
   client:
     service-url:
-      defaultZone: http://serviceregistry:8761
+      defaultZone: "http://serviceregistry_product_review:8761"
 
 management:
   health:
@@ -16,7 +16,7 @@ spring:
       indent-output: true
   cloud:
     config:
-      uri: http://configserver:8762
+      uri: "http://configserver_product_review:8762"
       # name of the config server's property source (file.yml) that we want to use
       name: productservice
       profile: dev
@@ -25,7 +25,11 @@ spring:
   data:
   elasticsearch:
     rest:
-      uris: http://elasticsearch:9200
-
+      uris: "http://elasticsearch_product_review:9200"
+  kafka:
+    consumer:
+      bootstrap-servers: "kafka_product_review:9092"
+  datasource:
+    url: "jdbc:mysql://mysql_product_review:3306/productservice?useSSL=false"
 server:
   port: 6015
